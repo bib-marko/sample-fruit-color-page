@@ -1,16 +1,15 @@
 <template>
     <div class="desktop-temp">
         <div class="col-1">
-            <img v-if="IS_DESKTOP" src="/img/details-desktop.png" class="details-desktop-img" />
-            <img v-else src="/img/details-mobile.png" class="details-desktop-img" />
+            <img src="/img/fruit/banner.png" class="details-desktop-img" />
 
             <div v-if="!IS_DESKTOP" class="desc">
                 <p>
-                MAGLARO AT MANALO NG BONGGANG PAPREMYO, DITO LANG SA
+                MAKULAY ANG LARO BONGGA ANG PAPREMYO, DITO LANG SA
                 <a href="https://megabet-paradise.com" target="_blank" rel="noopener noreferrer">MEGABET-PARADISE.COM</a>
                 </p>
             </div>
-            <img  @click="goToSite" v-if="!IS_DESKTOP" src="/img/play-btn.png" class="play-btn" />
+            <img  @click="goToSite" v-if="!IS_DESKTOP" src="/img/fruit/btn.png" class="play-btn" />
         </div>
 
     <div class="col-2">
@@ -46,10 +45,10 @@
         </div>
         <div v-if="IS_DESKTOP" class="desc">
             <p>
-            MAGLARO AT MANALO NG BONGGANG PAPREMYO, DITO LANG SA
+            MAKULAY ANG LARO BONGGA ANG PAPREMYO, DITO LANG SA
             </p>   <a href="https://megabet-paradise.com" target="_blank" rel="noopener noreferrer">MEGABET-PARADISE.COM</a>
         </div>
-        <img  @click="goToSite" v-if="IS_DESKTOP" src="/img/play-btn.png" class="play-btn" />
+        <img  @click="goToSite" v-if="IS_DESKTOP" src="/img/fruit/btn.png" class="play-btn" />
         </div>
     </div>
 </template>
@@ -106,13 +105,14 @@ const toggleMute = () => {
 }
 
 .details-desktop-img {
+  margin-top: -4rem;
     width: 100%;
-    max-width: 320px;
+    max-width: 540px;
     height: auto;
 }
 
 .desc {
-  margin-top: 10px;
+    margin-top: -3rem;
 }
 
 .logo,
@@ -239,19 +239,22 @@ a:hover {
     }
 
     .details-desktop-img {
+        position: absolute;
         width: 100%;
-        max-width: 840px;
-        height: auto;
+        max-width: 1000px;
+        height: 100vh;
+        margin-top: -33rem;
+        z-index: 1;
     }
 
     
     .col-1 {
         order: 1;
-        margin-left: 5rem;
+        margin-left: 3rem;
     }
     .col-2 {
         order: 2;
-        margin-right: 5rem;
+        margin-right: 3rem;
     }
 
     .logo {
@@ -266,6 +269,7 @@ a:hover {
     }
 
     .desc {
+        margin-top: .5rem;
         width: 100%;
         max-width: 740px;
         height: auto;
@@ -302,8 +306,19 @@ a:hover {
       max-width: 80%;
       margin-top: -2rem;
     }
-    
 
 }
+
+@media (max-width: 1440px) and (orientation: landscape) { 
+    .col-1 {
+        margin-top: 4rem;
+        margin-left: 3rem;
+    }
+    .col-2 {
+        margin-top: 4rem;
+        margin-right: 3rem;
+    }
+}
+
 
 </style>
