@@ -241,8 +241,8 @@ a:hover {
     .details-desktop-img {
         position: absolute;
         width: 100%;
-        max-width: 980px;
-        height: 100vh;
+        max-width: 930px;
+        height: 105vh;
         margin-top: -33rem;
         z-index: 1;
     }
