@@ -5,7 +5,7 @@
 
             <div v-if="!IS_DESKTOP" class="desc">
                 <p>
-                MAKULAY ANG LARO BONGGA ANG PAPREMYO, DITO LANG SA
+                LARONG MAKULAY, PANALONG TUNAY DITO LANG SA 
                 <a href="https://megabet-paradise.com" target="_blank" rel="noopener noreferrer">MEGABET-PARADISE.COM</a>
                 </p>
             </div>
@@ -45,7 +45,7 @@
         </div>
         <div v-if="IS_DESKTOP" class="desc">
             <p>
-            MAKULAY ANG LARO BONGGA ANG PAPREMYO, DITO LANG SA
+            LARONG MAKULAY, PANALONG TUNAY DITO LANG SA 
             </p>   <a href="https://megabet-paradise.com" target="_blank" rel="noopener noreferrer">MEGABET-PARADISE.COM</a>
         </div>
         <img  @click="goToSite" v-if="IS_DESKTOP" src="/img/fruit/btn.png" class="play-btn" />
@@ -158,12 +158,16 @@ const toggleMute = () => {
   object-fit: cover;
 }
 
+.desc {
+  margin-top: -4rem;
+  margin-bottom: 1rem;
+}
 a,
 .desc {
   font-family: 'Lilita One', sans-serif;
   color: white;
   text-align: center;
-  font-size: clamp(14px, 4vmin, 22px);
+  font-size: clamp(14px, 5vmin, 22px);
   line-height: 1.2;
 }
 
@@ -265,7 +269,7 @@ a:hover {
         cursor: pointer;
         max-width: 540px;
         height: auto;
-        margin-top: 1.5rem;
+        margin-top: 0rem;
     }
 
     .desc {
@@ -280,8 +284,8 @@ a:hover {
         font-family: 'Lilita One', sans-serif;
         color: white;
         text-align: center;
-        font-size: 3.5vmin;
-        line-height: 1.2;   
+        font-size: 5vmin;
+        line-height: .9;   
         padding: 0.5em 0;  
         width: 680px;
 
@@ -303,7 +307,7 @@ a:hover {
       border: 7px solid white;
       border-radius: 30px;
       overflow: hidden;
-      max-width: 80%;
+      max-width: 75%;
       margin-top: -2rem;
     }
 
