@@ -245,7 +245,7 @@ a:hover {
      .details-desktop-img {
         margin-top: -2rem;
         width: 100%;
-        max-width: 900px;
+        max-width: 840px;
         height: auto;
     }
 
@@ -267,11 +267,11 @@ a:hover {
         cursor: pointer;
         max-width: 540px;
         height: auto;
-        margin-top: 0rem;
+        margin-top: -1rem;
     }
 
     .desc {
-        margin-top: .5rem;
+        margin-top: -.5rem;
         width: 100%;
         max-width: 740px;
         height: auto;
