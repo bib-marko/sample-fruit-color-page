@@ -242,13 +242,11 @@ a:hover {
         justify-items: center;
     }
 
-    .details-desktop-img {
-        position: absolute;
+     .details-desktop-img {
+        margin-top: -2rem;
         width: 100%;
-        max-width: 930px;
-        height: 105vh;
-        margin-top: -33rem;
-        z-index: 1;
+        max-width: 900px;
+        height: auto;
     }
 
     
