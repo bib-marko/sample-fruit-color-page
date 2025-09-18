@@ -1,7 +1,8 @@
 <template>
     <div class="desktop-temp">
         <div class="col-1">
-            <img src="/img/fruit/banner.png" class="details-desktop-img" />
+            <img v-if="IS_DESKTOP" src="/img/fruit/banner.png" class="details-desktop-img" />
+            <img v-else src="/img/fruit/banner-mobile.png" class="details-desktop-img" />
 
             <div v-if="!IS_DESKTOP" class="desc">
                 <p>
@@ -243,7 +244,7 @@ a:hover {
     }
 
      .details-desktop-img {
-        margin-top: -2rem;
+      margin-top: 2rem;
         width: 100%;
         max-width: 840px;
         height: auto;
