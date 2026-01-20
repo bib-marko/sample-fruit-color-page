@@ -13,10 +13,6 @@
       alt="wheel border"
     />
 
-    <div v-if="props.position === 'top'" class="wheel-pointer top">
-      <img src="/img/arrow-1.webp" />
-    </div>
-
     <canvas
       ref="canvasRef"
       :width="size"
@@ -26,15 +22,21 @@
 
     <!-- VISUAL BUTTON ONLY -->
     <img
-      v-if="props.position === 'center'"
-      src="/img/btn-center.webp"
+      v-if="props.position === 'bottom'"
+      src="../assets/button-1.png"
+      class="wheel-button"
+      loading="lazy"
+    />
+    <img
+      v-else
+      src="../assets/button.png"
       class="wheel-button"
       loading="lazy"
     />
 
-    <div v-if="props.position === 'bottom'" class="wheel-pointer bottom">
+    <!-- <div v-if="props.position === 'bottom'" class="wheel-pointer bottom">
       <img src="/img/arrow-2.webp" />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -139,7 +141,6 @@ function drawWheel() {
     ctx.lineWidth = 6
     ctx.stroke()
 
-    const TEXT_OFFSET_X = -12 // ← adjust this value
     // TEXT (UNCHANGED)
     ctx.save()
     ctx.translate(radius.value, radius.value)
@@ -148,11 +149,7 @@ function drawWheel() {
     ctx.font = 'bold 30px sans-serif'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText(
-  p.label,
-  radius.value * 0.65 + TEXT_OFFSET_X,
-  0
-)
+    ctx.fillText(p.label, radius.value * 0.65, 0)
     ctx.restore()
 
     startAngle += sliceAngle
@@ -180,12 +177,18 @@ function spin() {
 
   const spins = 6
   const anglePerSlice = (Math.PI * 2) / props.prizes.length
-  const randomIndex = Math.floor(Math.random() * props.prizes.length)
+
+  const TARGET_ID =
+    props.position === 'top'
+      ? 3   // wheel #1 → 200
+      : 3   // wheel #2 → 300
+
+  const targetIndex = props.prizes.findIndex(p => p.id === TARGET_ID)
 
   const targetRotation =
     rotation +
     spins * Math.PI * 2 +
-    randomIndex * anglePerSlice +
+    targetIndex * anglePerSlice +
     anglePerSlice / 2 -
     Math.PI / 2
 

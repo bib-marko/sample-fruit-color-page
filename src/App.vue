@@ -1,10 +1,18 @@
 <template>
   <div class="wheel-stage-vertical">
+    <div
+      v-if="showIntroText"
+      class="spin-intro-overlay"
+    >
+      <span>SPIN THE WHEELS</span>
+      <br />
+      <span>TO WIN YOUR BONUS!</span>
+    </div>
     <!-- TOP -->
-    <div class="wheel wheel-top" :class="{ 'wheel-disabled': topDisabled }">
+    <div class="wheel wheel-top" :class="{ 'wheel-disabled': topDisabled }" :style="{ top: IS_LANDSCAPE ? '0': '8%' }">
       <Wheel
         ref="topWheel"
-        :position="'top'"
+        position="top"
         :prizes="prizesTop"
         :disabled="topDisabled"
         @finished="onTopFinished"
@@ -12,45 +20,32 @@
     </div>
 
     <!-- BOTTOM -->
-    <div class="wheel wheel-bottom" :class="{ 'wheel-disabled': bottomDisabled  }">
+    <div class="wheel wheel-bottom"    :class="{
+        'wheel-disabled': [0].includes(step),
+        'wheel-active': step === 2
+      }">
       <Wheel
         ref="bottomWheel"
-        :position="'bottom'"
+        position="bottom"
         :prizes="prizesBttom"
         :disabled="bottomDisabled"
         @finished="onBottomFinished"
       />
     </div>
-    <!-- CENTER -->
-    <div class="wheel wheel-center" 
-      :class="{
-        'wheel-disabled': [0,1].includes(step),
-        'wheel-active': step === 3
-      }"
-      :style="{  top: IS_LANDSCAPE? '42%' : '37%'}"
-    >
-      <Wheel
-        ref="centerWheel"
-        :position="'center'"
-        :prizes="prizesCenter"
-        :disabled="centerDisabled"
-        @finished="onCenterFinished"
-      />
+
+    <div class="spin-row">
+      <div class="spin-result">
+        PHP {{ data }}
+      </div>
+
+      <button
+        class="golden-button"
+        @click="startSpin"
+        :disabled="spinning || step >= 2"
+      >
+        SPIN
+      </button>
     </div>
-
-    <!-- SPIN BUTTON -->
-   <!-- <button
-  class="Btn"
-  @click="startSpin"
-  :disabled="spinning || step >= 3"
->
-  SPIN
-</button> -->
-
-<button role="button" class="golden-button" :style="{ width: IS_LANDSCAPE ? '15%' : '35%', bottom: IS_LANDSCAPE ? '8%' : '5%',  }"  @click="startSpin"  :disabled="spinning || step >= 3">
-  <span class="golden-text">SPIN HERE!</span>
-</button>
-
 
   </div>
 </template>
@@ -58,120 +53,103 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Wheel from './components/Wheel.vue'
-import { useOrientation } from "../src/service/orientation";
-const { IS_LANDSCAPE } = useOrientation();
-
-const prizesBttom = [
-  { id: 1, label: '200', color: '#45ace9', weight: 1 },
-  { id: 2, label: '50', color: '#45ace9', weight: 1 },
-  { id: 3, label: '100', color: '#45ace9', weight: 1 },
-  { id: 4, label: '200', color: '#45ace9', weight: 1 },
-  { id: 5, label: '50', color: '#45ace9', weight: 1 },
-  { id: 6, label: '100', color: '#45ace9', weight: 1 },
-]
+import Swal from 'sweetalert2'
+import { useOrientation } from '../src/service/orientation'
+const { IS_LANDSCAPE } = useOrientation()
 
 const prizesTop = [
-  { id: 1, label: '500', color: '#dd3832', weight: 1 },
-  { id: 2, label: '50', color: '#dd3832', weight: 1 },
-  { id: 3, label: '200', color: '#dd3832', weight: 1 },
-  { id: 4, label: '500', color: '#dd3832', weight: 1 },
-  { id: 5, label: '50', color: '#dd3832', weight: 1 },
-  { id: 6, label: '200', color: '#dd3832', weight: 1 },
+  { id: 1, label: '200', color: '#dd3832', weight: 1 },
+  { id: 2, label: '500', color: '#dd3832', weight: 1 },
+  { id: 3, label: '50', color: '#dd3832', weight: 1 },
+  { id: 4, label: '200', color: '#dd3832', weight: 1 },
+  { id: 5, label: '500', color: '#dd3832', weight: 1 },
+  { id: 6, label: '50', color: '#dd3832', weight: 1 },
 ]
 
-const prizesCenter = [
-  { id: 1, label: '500', color: '#002F05', weight: 1 },
-  { id: 2, label: '50', color: '#002F05', weight: 1 },
-  { id: 3, label: '200', color: '#002F05', weight: 1 },
-  { id: 4, label: '500', color: '#002F05', weight: 1 },
-  { id: 5, label: '50', color: '#002F05', weight: 1 },
-  { id: 6, label: '200', color: '#002F05', weight: 1 },
+const prizesBttom = [
+  { id: 1, label: '300', color: '#45ace9', weight: 1 },
+  { id: 2, label: '100', color: '#45ace9', weight: 1 },
+  { id: 3, label: '50', color: '#45ace9', weight: 1 },
+  { id: 4, label: '300', color: '#45ace9', weight: 1 },
+  { id: 5, label: '100', color: '#45ace9', weight: 1 },
+  { id: 6, label: '50', color: '#45ace9', weight: 1 },
 ]
 
-const bottomWheel = ref<any>(null)
+const showIntroText = ref(true)
 const topWheel = ref<any>(null)
-const centerWheel = ref<any>(null)
+const bottomWheel = ref<any>(null)
 
+const data = ref(0);
 const step = ref(0)
-
 const spinning = ref(false)
 
-const bottomDisabled = ref(false)
-const topDisabled = ref(true)
-const centerDisabled = ref(true)
+const topDisabled = ref(false)
+const bottomDisabled = ref(true)
 
-const results = {
-  bottom: '',
-  top: '',
-  center: '',
-}
-
-/* MAIN SPIN BUTTON */
 function startSpin() {
-  if (spinning.value || step.value >= 3) return
-
+  showIntroText.value = false;
+  if (spinning.value) return
   spinning.value = true
 
   if (step.value === 0) {
-    bottomWheel.value.spin()
+    topWheel.value.spin(1) 
   } else if (step.value === 1) {
-    topWheel.value.spin()
-  } else if (step.value === 2) {
-    centerWheel.value.spin()
+    bottomWheel.value.spin(1) 
   }
 }
 
-/* BOTTOM FINISHED */
-function onBottomFinished(prize: any) {
-  results.bottom = prize.label
-  bottomDisabled.value = true
-  topDisabled.value = false
-
+function onTopFinished(prize: any) {
+  topDisabled.value = true
+  bottomDisabled.value = false
   spinning.value = false
   step.value = 1
+  data.value = 200;
 }
 
-/* TOP FINISHED */
-function onTopFinished(prize: any) {
-  results.top = prize.label
-  topDisabled.value = true
-  centerDisabled.value = false
-
+function onBottomFinished(prize: any) {
+  bottomDisabled.value = true
   spinning.value = false
   step.value = 2
-}
 
-/* CENTER FINISHED */
-function onCenterFinished(prize: any) {
-  results.center = prize.label
-  centerDisabled.value = true
+  data.value = data.value + 300;
 
-  spinning.value = false
-  step.value = 3
+Swal.fire({
+  title: "CONGRATULATIONS!",
+  width: 500,
+  padding: "3em",
+  color: "#716add",
+  background: "#fff url(/images/trees.png)",
+  confirmButtonText: "CLAIM NOW",
+  text: "Congratulations! Your Welcome Bonus Spin rewarded you with a 200 + 300 bonus , enjoy!",
+  backdrop: `
+    rgba(0,0,123,0.4)
+    url("/images/nyan-cat.gif")
+    left top
+    no-repeat
+  `
+});
 
-//   alert(`
-// RESULTS:
-// Bottom: ${results.bottom}
-// Top: ${results.top}
-// Center: ${results.center}
-//   `)
+
 }
 </script>
 
 
+
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Geist:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
+  font-family: 'Poppins';
 }
 
 body {
   position: relative;
   overflow: hidden;
-  background: url('/public/img/bg.webp') center center / cover no-repeat;
+  background: url('/public/img/bg-desktop.png') center center / cover no-repeat;
 }
 
 /* BLACK OVERLAY */
@@ -179,7 +157,7 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6); /* 👈 adjust opacity */
+  background: rgba(0, 0, 0, 0.3); /* 👈 adjust opacity */
   z-index: 0;
   pointer-events: none;
 }
@@ -199,32 +177,45 @@ body::before {
 }
 /* TOP */
 .wheel-top {
-  top: 0;
   z-index: 1;
 }
 
 /* BOTTOM */
 .wheel-bottom {
-  top: 40%;
-  bottom: 0;
+  bottom: 20%;
   z-index: 1;
-  
 }
 
-/* CENTER */
-.wheel-center {
-  transform: translate(-50%, -50%);
-  z-index: 3;
+
+.spin-row {
+  position: fixed;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 0.6rem;
+  z-index: 1;
+}
+
+.spin-result {
+  min-width: 5rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: black;
+  background: white;
+  border-radius: 0.4rem;
+  text-align: center;
 }
 
 
 /* From Uiverse.io by elijahgummer */ 
 .golden-button {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;       
-
+  position: relative; /* 👈 important */
   touch-action: manipulation;
   display: inline-block;
   outline: none;
@@ -260,7 +251,6 @@ body::before {
   transition: all 0.2s ease-in-out;
 }
 
-
 .golden-button:focus,
 .golden-button:hover {
   background-size: 150% 150%;
@@ -276,7 +266,7 @@ body::before {
 }
 
 .wheel-disabled {
-  filter: grayscale(95%) brightness(0.45);
+  filter: grayscale(5%) brightness(0.45);
   transition: filter 0.3s ease;
 }
 
@@ -289,6 +279,88 @@ body::before {
   transition:
     filter 0.45s ease,
     transform 0.45s ease;
+}
+
+.swal2-popup {
+  position: relative;
+  padding: .9em !important;
+  background: #faf2dd !important;
+  border-radius: 16px;
+  overflow: hidden; /* 👈 important */
+}
+
+.swal2-popup::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 5px;
+  background: linear-gradient(to bottom, #ffb620, #ff8c26);
+  border-radius: 16px;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.swal2-title {
+  font-size: 28px;
+  color:#dd692b;
+}
+
+
+.swal2-html-container {
+  color:#ba8966;
+}
+
+.swal2-confirm {
+  width: 150px;
+  height: 40px;
+  margin-bottom: .2em !important;
+  font-size: .875rem !important;
+  padding: .3rem !important;
+  border-radius: 2rem !important;
+  color: #fdf9d7 !important;
+  font-weight: 700 !important;
+  border: .124rem solid #175813 !important;
+  border-bottom: .125rem solid #175813 !important;
+  background: linear-gradient(to bottom, #4ed107, #1c8f00) !important;
+  text-shadow: .1em 0 0 #316826, -.1em 0 0 #316826, 0 .1em 0 #316826, 0 -.08em 0 #316826, -.08em -.08em 0 #316826, .08em -.08em 0 #316826, -.08em .08em 0 #316826, .08em .08em 0 #316826, 0 .15em .1em #0000004b !important; 
+  box-shadow: 0 .15em .2em #00000047 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.spin-intro-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  line-height: 12px;
+  width: 80%;
+  text-align: center;
+
+  z-index: 2;
+  pointer-events: none;
+}
+
+.spin-intro-overlay span {
+  display: inline-block;
+
+  padding: 0.6rem 1.2rem;
+  font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+
+  color: #fff;
+  text-transform: uppercase;
+
+  text-shadow:
+    0 0 6px rgba(255, 215, 0, 0.9),
+    0 0 16px rgba(255, 180, 0, 0.8),
+    0 0 28px rgba(255, 140, 0, 0.6);
 }
 
 
