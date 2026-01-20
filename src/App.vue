@@ -157,7 +157,6 @@ function onBottomFinished() {
 }
 
 let bgMusic: HTMLAudioElement | null = null
-const musicReady = ref(false)
 const musicUnlocked = ref(false)
 
 function setupMusic() {
