@@ -98,7 +98,7 @@ function startSpin() {
   }
 }
 
-function onTopFinished(prize: any) {
+function onTopFinished() {
   topDisabled.value = true
   bottomDisabled.value = false
   spinning.value = false
@@ -106,7 +106,7 @@ function onTopFinished(prize: any) {
   data.value = 200;
 }
 
-function onBottomFinished(prize: any) {
+function onBottomFinished() {
   bottomDisabled.value = true
   spinning.value = false
   step.value = 2
