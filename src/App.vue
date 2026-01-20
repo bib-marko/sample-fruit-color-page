@@ -1,13 +1,24 @@
 <template>
-  <div class="wheel-stage-vertical">
+  <!-- FULLSCREEN LOADING -->
+  <div
+    v-if="loading"
+    class="loading-screen"
+    :class="{ exiting: loadingExiting }"
+    @click="onLoadingTap"
+    @touchstart="onLoadingTap"
+  >
+    <div class="loading-content">
+      <img src="/public/img/megabet_logo.webp" class="animate__animated animate__bounce animate__bounce" />
+      <div class="loading-text">TAP TO START...</div>
+    </div>
+  </div>
 
-    <!-- <div
-      v-if="step === 1"
-      class="spin-intro-overlay"
-    >
-      <span>YOU WON ₱200</span>
-    </div> -->
-
+  <!-- ACTUAL GAME -->
+  <div
+    v-else
+    class="wheel-stage-vertical loaded"
+  >
+    <!-- INTRO TEXT -->
     <div
       v-if="showIntroText"
       class="spin-intro-overlay"
@@ -16,9 +27,13 @@
       <br />
       <span>TO WIN YOUR BONUS!</span>
     </div>
-    
+
     <!-- TOP -->
-    <div class="wheel wheel-top" :class="{ 'wheel-disabled': topDisabled }" :style="{ top: IS_LANDSCAPE ? '0': '8%' }">
+    <div
+      class="wheel wheel-top"
+      :class="{ 'wheel-disabled': topDisabled }"
+      :style="{ top: IS_LANDSCAPE ? '0' : '8%' }"
+    >
       <Wheel
         ref="topWheel"
         position="top"
@@ -27,25 +42,27 @@
         @finished="onTopFinished"
       />
     </div>
-    <!-- BOTTOM -->
-   <div
-    class="wheel-wrapper"
-    :class="{
-      'wheel-disabled': step === 0,
-      'wheel-active': step === 2
-    }"
-  >
-    <div class="wheel wheel-bottom">
-      <Wheel
-        ref="bottomWheel"
-        position="bottom"
-        :prizes="prizesBttom"
-        :disabled="bottomDisabled"
-        @finished="onBottomFinished"
-      />
-    </div>
-  </div>
 
+    <!-- BOTTOM -->
+    <div
+      class="wheel-wrapper"
+      :class="{
+        'wheel-disabled': step === 0,
+        'wheel-active': step === 2
+      }"
+    >
+      <div class="wheel wheel-bottom">
+        <Wheel
+          ref="bottomWheel"
+          position="bottom"
+          :prizes="prizesBttom"
+          :disabled="bottomDisabled"
+          @finished="onBottomFinished"
+        />
+      </div>
+    </div>
+
+    <!-- SPIN ROW -->
     <div class="spin-row">
       <div class="spin-result">
         PHP {{ data }}
@@ -59,12 +76,12 @@
         SPIN
       </button>
     </div>
-
   </div>
 </template>
 
+
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Wheel from './components/Wheel.vue'
 import Swal from 'sweetalert2'
 import { useOrientation } from '../src/service/orientation'
@@ -134,14 +151,85 @@ function onBottomFinished() {
     text: "Congratulations! Your Welcome Bonus Spin rewarded you with a 200 + 300 bonus, enjoy!",
   }).then((result) => {
     if (result.isConfirmed) {
-      window.location.href = "/welcome-bonus";
+      window.location.href = "https://megabet-paradise.com/welcome-bonus";
     }
   });
-
 }
+
+let bgMusic: HTMLAudioElement | null = null
+const musicReady = ref(false)
+const musicUnlocked = ref(false)
+
+function setupMusic() {
+  if (bgMusic) return
+
+  bgMusic = new Audio('/public/music/music-1.mp3')
+  bgMusic.loop = true
+  bgMusic.volume = 0.35
+  bgMusic.preload = 'auto'
+  bgMusic.muted = true
+}
+
+function onLoadingTap() {
+  // 🔓 unlock music (iOS safe)
+  if (bgMusic && !musicUnlocked.value) {
+    bgMusic.muted = false
+    bgMusic.play().then(() => {
+      musicUnlocked.value = true
+    })
+  }
+
+  // 🎬 exit loading screen
+  loadingExiting.value = true
+
+  setTimeout(() => {
+    loading.value = false
+  }, 250)
+}
+
+const loading = ref(true)
+const loadingExiting = ref(false)
+
+function preloadFromGlob(globResult: Record<string, () => Promise<any>>) {
+  return Promise.all(
+    Object.values(globResult).map((importer) =>
+      importer().then((mod) => {
+        return new Promise<void>((resolve) => {
+          const img = new Image()
+          img.src = mod.default
+          img.onload = () => resolve()
+          img.onerror = () => resolve()
+        })
+      })
+    )
+  )
+}
+
+function wait(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+onMounted(async () => {
+  setupMusic()
+  const assetImages = import.meta.glob(
+    '/src/assets/**/*.{png,jpg,jpeg,webp,gif,svg}'
+  )
+
+  const publicImages = import.meta.glob(
+    '/public/img/**/*.{png,jpg,jpeg,webp,gif,svg}'
+  )
+
+  await Promise.all([
+    preloadFromGlob(assetImages),
+    preloadFromGlob(publicImages),
+    wait(1000),
+  ])
+
+  // loading.value = false
+})
+
+
 </script>
-
-
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Geist:wght@100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
@@ -423,6 +511,76 @@ body::before {
     0 0 6px rgba(255, 215, 0, 0.9),
     0 0 16px rgba(255, 180, 0, 0.8),
     0 0 28px rgba(255, 140, 0, 0.6);
+}
+
+
+/* ===============================
+   FULLSCREEN LOADING SCREEN
+================================ */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-image: radial-gradient(circle, orange, transparent 20%, orangered);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: orange;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+.loading-screen.exiting {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loading-content img {
+    width: 50%;
+}
+
+/* Spinner */
+.loading-spinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 4px solid rgba(0, 0, 0, 0.25);
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: white;
+  font-size: 0.9rem;
+}
+
+/* ===============================
+   FADE-IN GAME AFTER LOAD
+================================ */
+.wheel-stage-vertical {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.wheel-stage-vertical.loaded {
+  opacity: 1;
 }
 
 
