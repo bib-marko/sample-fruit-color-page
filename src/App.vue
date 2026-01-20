@@ -1,5 +1,13 @@
 <template>
   <div class="wheel-stage-vertical">
+
+    <!-- <div
+      v-if="step === 1"
+      class="spin-intro-overlay"
+    >
+      <span>YOU WON ₱200</span>
+    </div> -->
+
     <div
       v-if="showIntroText"
       class="spin-intro-overlay"
@@ -8,6 +16,7 @@
       <br />
       <span>TO WIN YOUR BONUS!</span>
     </div>
+    
     <!-- TOP -->
     <div class="wheel wheel-top" :class="{ 'wheel-disabled': topDisabled }" :style="{ top: IS_LANDSCAPE ? '0': '8%' }">
       <Wheel
@@ -18,12 +27,15 @@
         @finished="onTopFinished"
       />
     </div>
-
     <!-- BOTTOM -->
-    <div class="wheel wheel-bottom"    :class="{
-        'wheel-disabled': [0].includes(step),
-        'wheel-active': step === 2
-      }">
+   <div
+    class="wheel-wrapper"
+    :class="{
+      'wheel-disabled': step === 0,
+      'wheel-active': step === 2
+    }"
+  >
+    <div class="wheel wheel-bottom">
       <Wheel
         ref="bottomWheel"
         position="bottom"
@@ -32,6 +44,7 @@
         @finished="onBottomFinished"
       />
     </div>
+  </div>
 
     <div class="spin-row">
       <div class="spin-result">
@@ -98,13 +111,13 @@ function startSpin() {
   }
 }
 
-function onTopFinished() {
-  topDisabled.value = true
-  bottomDisabled.value = false
-  spinning.value = false
-  step.value = 1
-  data.value = 200;
-}
+  function onTopFinished() {
+    topDisabled.value = true
+    bottomDisabled.value = false
+    spinning.value = false
+    step.value = 1
+    data.value = 200;
+  }
 
 function onBottomFinished() {
   bottomDisabled.value = true
@@ -113,22 +126,17 @@ function onBottomFinished() {
 
   data.value = data.value + 300;
 
-Swal.fire({
-  title: "CONGRATULATIONS!",
-  width: 500,
-  padding: "3em",
-  color: "#716add",
-  background: "#fff url(/images/trees.png)",
-  confirmButtonText: "CLAIM NOW",
-  text: "Congratulations! Your Welcome Bonus Spin rewarded you with a 200 + 300 bonus , enjoy!",
-  backdrop: `
-    rgba(0,0,123,0.4)
-    url("/images/nyan-cat.gif")
-    left top
-    no-repeat
-  `
-});
-
+  Swal.fire({
+    title: "CONGRATULATIONS!",
+    width: 500,
+    background: "#fff url(/images/trees.png)",
+    confirmButtonText: "CLAIM NOW",
+    text: "Congratulations! Your Welcome Bonus Spin rewarded you with a 200 + 300 bonus, enjoy!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = "/welcome-bonus";
+    }
+  });
 
 }
 </script>
@@ -162,18 +170,43 @@ body::before {
   pointer-events: none;
 }
 .wheel-stage-vertical {
-  margin-top: 4rem;
+  margin-top: 3%;
   position: relative;
   width: 100%;
   height: 90vh;
 }
 
 /* COMMON */
+/* wrapper controls visual state */
+.wheel-wrapper {
+  position: absolute;
+  left: 50%;
+  bottom: 20%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* actual wheel keeps transform only */
 .wheel {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   filter: drop-shadow(0 0 1vmin #000000);
+}
+/* DISABLED STATE */
+.wheel-wrapper.wheel-disabled {
+  filter: grayscale(.8) brightness(0.6);
+  transition: filter 0.3s ease;
+}
+
+/* ACTIVE GLOW */
+.wheel-wrapper.wheel-active {
+  filter:
+    drop-shadow(0 0 0.4rem rgba(255, 215, 0, 0.5))
+    drop-shadow(0 0 1rem rgba(255, 215, 0, 0.65))
+    drop-shadow(0 0 2rem rgba(255, 180, 0, 0.85))
+    drop-shadow(0 0 3rem rgba(255, 150, 0, 0.6));
+  transition: filter 0.45s ease;
 }
 /* TOP */
 .wheel-top {
@@ -191,7 +224,7 @@ body::before {
   position: fixed;
   bottom: 5%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateZ(0); /* iOS safe */
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -210,7 +243,35 @@ body::before {
   background: white;
   border-radius: 0.4rem;
   text-align: center;
+
+    /* glow */
+  filter: drop-shadow(0 0 0.4rem rgba(255, 215, 0, 0.6));
+  animation: spinRowPulse 1.8s ease-in-out infinite;
+  will-change: filter;
 }
+
+
+@keyframes spinRowPulse {
+  0% {
+    filter:
+      drop-shadow(0 0 0.3rem rgba(255, 215, 0, 0.35))
+      drop-shadow(0 0 0.6rem rgba(255, 180, 0, 0.25));
+  }
+
+  50% {
+    filter:
+      drop-shadow(0 0 0.8rem rgba(255, 215, 0, 0.8))
+      drop-shadow(0 0 1.6rem rgba(255, 180, 0, 0.6))
+      drop-shadow(0 0 2.4rem rgba(255, 140, 0, 0.45));
+  }
+
+  100% {
+    filter:
+      drop-shadow(0 0 0.3rem rgba(255, 215, 0, 0.35))
+      drop-shadow(0 0 0.6rem rgba(255, 180, 0, 0.25));
+  }
+}
+
 
 
 /* From Uiverse.io by elijahgummer */ 
@@ -228,6 +289,7 @@ body::before {
   line-height: 2.5em;
   text-transform: uppercase;
   padding: 0 1.2em;
+  font-weight: bolder;
 
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.16),
