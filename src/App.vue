@@ -13,12 +13,10 @@
     </div>
   </div>
 
-  <!-- ACTUAL GAME -->
   <div
     v-else
     class="wheel-stage-vertical loaded"
   >
-    <!-- INTRO TEXT -->
     <div
       v-if="showIntroText"
       class="spin-intro-overlay"
@@ -28,7 +26,6 @@
       <span>TO WIN YOUR BONUS!</span>
     </div>
 
-    <!-- TOP -->
     <div
       class="wheel wheel-top"
       :class="{ 'wheel-disabled': topDisabled }"
@@ -76,12 +73,17 @@
         SPIN
       </button>
     </div>
+    <div class="icons">
+      <img src="/public/img/TAO.webp" v-if="!IS_LANDSCAPE" class="girl" />
+      <img src="/public/img/tree.webp" v-if="!IS_LANDSCAPE" class="tree" />
+    </div>
+    
   </div>
 </template>
 
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Wheel from './components/Wheel.vue'
 import Swal from 'sweetalert2'
 import { useOrientation } from '../src/service/orientation'
@@ -156,6 +158,17 @@ function onBottomFinished() {
   });
 }
 
+
+function updateBodyBackground() {
+  document.body.style.backgroundImage = IS_LANDSCAPE.value
+    ? "url('/img/bg.webp')"
+    : "url('/img/bg-mobile.png')"
+
+  document.body.style.backgroundSize = 'cover'
+  document.body.style.backgroundPosition = 'center'
+  document.body.style.backgroundRepeat = 'no-repeat'
+}
+
 let bgMusic: HTMLAudioElement | null = null
 const musicUnlocked = ref(false)
 
@@ -210,6 +223,7 @@ function wait(ms: number) {
 
 onMounted(async () => {
   setupMusic()
+  updateBodyBackground()
   const assetImages = import.meta.glob(
     '/src/assets/**/*.{png,jpg,jpeg,webp,gif,svg}'
   )
@@ -225,6 +239,11 @@ onMounted(async () => {
   ])
 
   // loading.value = false
+})
+
+
+watch(IS_LANDSCAPE, () => {
+  updateBodyBackground()
 })
 
 
@@ -244,7 +263,7 @@ html, body {
 body {
   position: relative;
   overflow: hidden;
-  background: url('/public/img/bg-desktop.png') center center / cover no-repeat;
+  background: url('/public/img/bg.webp') center center / cover no-repeat;
 }
 
 /* BLACK OVERLAY */
@@ -252,7 +271,6 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3); /* 👈 adjust opacity */
   z-index: 0;
   pointer-events: none;
 }
@@ -318,7 +336,7 @@ body::before {
   padding: 0.5rem 0.75rem;
   background: rgba(0, 0, 0, 0.45);
   border-radius: 0.6rem;
-  z-index: 1;
+  z-index: 2;
 }
 
 .spin-result {
@@ -360,8 +378,6 @@ body::before {
 }
 
 
-
-/* From Uiverse.io by elijahgummer */ 
 .golden-button {
   position: relative; /* 👈 important */
   touch-action: manipulation;
@@ -435,7 +451,7 @@ body::before {
   padding: .9em !important;
   background: #faf2dd !important;
   border-radius: 16px;
-  overflow: hidden; /* 👈 important */
+  overflow: hidden;
 }
 
 .swal2-popup::before {
@@ -512,10 +528,6 @@ body::before {
     0 0 28px rgba(255, 140, 0, 0.6);
 }
 
-
-/* ===============================
-   FULLSCREEN LOADING SCREEN
-================================ */
 .loading-screen {
   position: fixed;
   inset: 0;
@@ -547,7 +559,6 @@ body::before {
     width: 50%;
 }
 
-/* Spinner */
 .loading-spinner {
   width: 56px;
   height: 56px;
@@ -570,9 +581,6 @@ body::before {
   font-size: 0.9rem;
 }
 
-/* ===============================
-   FADE-IN GAME AFTER LOAD
-================================ */
 .wheel-stage-vertical {
   opacity: 0;
   transition: opacity 0.45s ease;
@@ -582,5 +590,27 @@ body::before {
   opacity: 1;
 }
 
+.icons {
+  margin-top: -1rem;
+}
+.girl {
+  position: fixed;        /* stick to viewport */
+  left: -10%;              /* adjust spacing */
+  bottom: 0;              /* bottom aligned */
+  z-index: 1;             /* above background, below loader/UI */
+  pointer-events: none;  /* optional: clicks pass through */
+  width: 220px; /* responsive size */
+  height: auto;
+}
+
+.tree {
+  position: fixed;        /* stick to viewport */
+  right: -30%;              /* adjust spacing */
+  bottom: 0%;              /* bottom aligned */
+  z-index: 1;             /* above background, below loader/UI */
+  pointer-events: none;  /* optional: clicks pass through */
+  width: 300px; /* responsive size */
+  height: auto;
+}
 
 </style>
