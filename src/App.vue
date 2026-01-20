@@ -8,7 +8,7 @@
     @touchstart="onLoadingTap"
   >
     <div class="loading-content">
-      <img src="/public/img/megabet_logo.webp" class="animate__animated animate__bounce animate__bounce" />
+      <img src="/public/img/megabet_logo.webp" class="animate__animated animate__bounce animate__infinite" />
       <div class="loading-text">TAP TO START...</div>
     </div>
   </div>
