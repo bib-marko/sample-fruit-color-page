@@ -102,7 +102,7 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import Wheel from './components/Wheel.vue'
 import Swal from 'sweetalert2'
 import { useOrientation } from '../src/service/orientation'
@@ -359,7 +359,6 @@ watch(IS_LANDSCAPE, () => {
 watch(showIntroText, async (visible) => {
   if (!visible) return
 
-  // ⏳ wait for v-if DOM to exist
   await nextTick()
 
   playIntroReveal()
