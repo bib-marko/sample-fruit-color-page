@@ -231,7 +231,6 @@ function onBottomFinished() {
   })
 }
 
-const introContainer = ref<HTMLElement | null>(null)
 const line1 = ref<HTMLElement | null>(null)
 const line2 = ref<HTMLElement | null>(null)
 
