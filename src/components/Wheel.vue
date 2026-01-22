@@ -23,15 +23,20 @@
     <!-- VISUAL BUTTON ONLY -->
     <img
       v-if="props.position === 'bottom'"
-      src="../assets/button-1.png"
-      class="wheel-button"
+      src="../assets/mlue.webp"
+      class="wheel-button clickable"
+      :class="{ 'spin-active': !props.disabled && !isSpinning }"
       loading="lazy"
+      @click="requestSpin"
     />
+
     <img
       v-else
       src="../assets/button.png"
-      class="wheel-button"
+      class="wheel-button clickable"
+      :class="{ 'spin-active': !props.disabled && !isSpinning }"
       loading="lazy"
+      @click="requestSpin"
     />
 
     <!-- <div v-if="props.position === 'bottom'" class="wheel-pointer bottom">
@@ -64,7 +69,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'finished', prize: Prize): void
+  (e: 'spin-request'): void
 }>()
+
 
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -218,6 +225,11 @@ function spin() {
 
 defineExpose({ spin })
 
+function requestSpin() {
+  if (props.disabled || isSpinning.value) return
+  emit('spin-request')
+}
+
 onMounted(() => {
   ctx = canvasRef.value!.getContext('2d')!
   drawWheel()
@@ -283,6 +295,45 @@ onMounted(() => {
 .wheel-pointer.bottom {
   bottom: -8%;
   transform: translateX(-50%) rotate(180deg);
+}
+
+
+.spin-active {
+  filter:
+    drop-shadow(0 0 8px rgba(255, 215, 0, 0.8))
+    drop-shadow(0 0 16px rgba(255, 180, 0, 0.6))
+    drop-shadow(0 0 28px rgba(255, 140, 0, 0.45));
+  animation: spin-glow-pulse 1.6s ease-in-out infinite;
+}
+
+/* Subtle pulsing glow */
+@keyframes spin-glow-pulse {
+  0% {
+    filter:
+      drop-shadow(0 0 6px rgba(255, 215, 0, 0.6))
+      drop-shadow(0 0 12px rgba(255, 180, 0, 0.4));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 12px rgba(255, 215, 0, 1))
+      drop-shadow(0 0 24px rgba(255, 180, 0, 0.8))
+      drop-shadow(0 0 36px rgba(255, 140, 0, 0.6));
+  }
+  100% {
+    filter:
+      drop-shadow(0 0 6px rgba(255, 215, 0, 0.6))
+      drop-shadow(0 0 12px rgba(255, 180, 0, 0.4));
+  }
+}
+
+.clickable {
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.15s ease;
+}
+
+.clickable:active {
+  transform: translate(-50%, -50%) scale(0.95);
 }
 
 </style>
