@@ -265,7 +265,6 @@ function updateBodyBackground() {
 }
 
 let bgMusic: HTMLAudioElement | null = null
-const musicUnlocked = ref(false)
 
 function setupMusic() {
   if (bgMusic) return
