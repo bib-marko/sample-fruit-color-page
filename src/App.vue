@@ -1,21 +1,8 @@
 <template>
   <!-- FULLSCREEN LOADING -->
   <div id="fireworks-layer"></div>
-  <div
-    v-if="loading"
-    class="loading-screen"
-    :class="{ exiting: loadingExiting }"
-    @click="onLoadingTap"
-    @touchstart="onLoadingTap"
-  >
-    <div class="loading-content">
-      <img src="/public/img/megabet_logo.webp" class="animate__animated animate__bounce animate__infinite" />
-      <div class="loading-text">TAP TO START...</div>
-    </div>
-  </div>
 
   <div
-    v-else
     class="wheel-stage-vertical loaded"
   >
     <div
@@ -289,26 +276,6 @@ function setupMusic() {
   bgMusic.preload = 'auto'
   bgMusic.muted = true
 }
-
-function onLoadingTap() {
-  // 🔓 unlock music (iOS safe)
-  if (bgMusic && !musicUnlocked.value) {
-    bgMusic.muted = false
-    bgMusic.play().then(() => {
-      musicUnlocked.value = true
-    })
-  }
-
-  // 🎬 exit loading screen
-  loadingExiting.value = true
-
-  setTimeout(() => {
-    loading.value = false
-  }, 250)
-}
-
-const loading = ref(true)
-const loadingExiting = ref(false)
 
 function preloadFromGlob(globResult: Record<string, () => Promise<any>>) {
   return Promise.all(
