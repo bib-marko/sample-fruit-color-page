@@ -38,10 +38,6 @@
       loading="lazy"
       @click="requestSpin"
     />
-
-    <!-- <div v-if="props.position === 'bottom'" class="wheel-pointer bottom">
-      <img src="/img/arrow-2.webp" />
-    </div> -->
   </div>
 </template>
 

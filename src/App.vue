@@ -1,7 +1,6 @@
 <template>
   <!-- FULLSCREEN LOADING -->
   <div id="fireworks-layer"></div>
-
   <div
     class="wheel-stage-vertical loaded"
   >
@@ -14,7 +13,6 @@
       <br />
       <span ref="line2">TO WIN YOUR BONUS!</span>
     </div>
-
     <div
       class="wheel wheel-top"
       :class="{ 'wheel-disabled': topDisabled }"
@@ -29,7 +27,6 @@
         @finished="onTopFinished"
       />
     </div>
-
     <!-- BOTTOM -->
     <div
       class="wheel-wrapper"
@@ -49,41 +46,24 @@
         />
       </div>
     </div>
-
     <!-- SPIN ROW -->
     <div class="spin-row">
-      <!-- <div class="spin-result">
-        PHP {{ data }}
-      </div> -->
-
-      <!-- <button
-        class="golden-button"
-        @click="startSpin"
-        :disabled="spinning || step >= 2"
-      >
-        SPIN
-      </button> -->
-
-      
       <div class="comic-brutal-button-container">
-  <button class="comic-brutal-button">
-    <div class="button-inner">
-      <span class="button-text"> ₱ {{ data }}</span>
-      <div class="halftone-overlay"></div>
-      <div class="ink-splatter"></div>
-    </div>
-    <div class="button-shadow"></div>
-    <div class="button-frame"></div>
-  </button>
-</div>
-
-      
+        <button class="comic-brutal-button">
+          <div class="button-inner">
+            <span class="button-text"> ₱ {{ data }}</span>
+            <div class="halftone-overlay"></div>
+            <div class="ink-splatter"></div>
+          </div>
+          <div class="button-shadow"></div>
+          <div class="button-frame"></div>
+        </button>
+      </div>
     </div>
     <div class="icons">
       <img src="/public/img/TAO.webp" v-if="!IS_LANDSCAPE" class="girl" />
       <img src="/public/img/tree.webp" v-if="!IS_LANDSCAPE" class="tree" />
     </div>
-    
   </div>
 </template>
 
